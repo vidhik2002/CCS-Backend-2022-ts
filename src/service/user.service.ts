@@ -31,9 +31,7 @@ export async function createUser(input: UserInput) {
         ],
       });
     } else {
-      duplicate = await UserModel.findOne({
-        $or: [{ email: input.email }, { username: input.username }],
-      });
+      duplicate = await UserModel.findOne({ email: input.email });
     }
     if (duplicate) {
       jsonResponse.message = constants.duplicate;
@@ -41,9 +39,9 @@ export async function createUser(input: UserInput) {
       if (duplicate.email === input.email) {
         jsonResponse.duplicates.push("Email");
       }
-      if (duplicate.username === input.username) {
-        jsonResponse.duplicates.push("Username");
-      }
+      // if (duplicate.username === input.username) {
+      //   jsonResponse.duplicates.push("Username");
+      // }
 
       if (input.isVitian && duplicate.regNo === input.regNo) {
         jsonResponse.duplicates.push("Registration Number");
@@ -72,15 +70,9 @@ export async function createUser(input: UserInput) {
   }
 }
 
-export async function validatePassword({
-  email,
-  password,
-  username,
-}: SessionInput) {
+export async function validatePassword({ email, password }: SessionInput) {
   try {
-    const user = await UserModel.findOne({
-      $or: [{ email }, { username }],
-    });
+    const user = await UserModel.findOne({ email });
 
     if (!user) {
       return false;
